@@ -17,6 +17,11 @@ const UserSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
+    },
+    type: {
+        type: String,
+        required: false,
+        default: 'normal' // superuser for certain users
     }
 });
 

@@ -13,6 +13,7 @@ app.use(express.json()); // middleware for parsing application/json in req.body
 
 // Available routes
 app.use('/api/auth/', (require('./routes/auth')));
+app.use('/api/portfolios/', (require('./routes/portfolio')));
 
 app.listen(port, () => {
     console.log(`Listening at http://${host}:${port}`);
