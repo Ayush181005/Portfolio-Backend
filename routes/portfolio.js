@@ -3,15 +3,14 @@ const Portfolio = require('../models/portfolio');
 const { body, validationResult } = require('express-validator');
 const fetchUser = require('../middleware/fetchUser');
 const User = require('../models/User');
-const mongoose = require('mongoose');
 
 const router = express.Router();
 
 // ROUTE 1:-
-// Get all portfolios using: POST "/api/portfolio/getportfolios"
+// Get all portfolios using: POST "/api/portfolios/getportfolios"
 router.post('/getportfolios', async (req, res) => {
     try {
-        myPortfolios = await Portfolio.find()
+        const myPortfolios = await Portfolio.find()
         res.json(myPortfolios);
     } catch (error) {
         console.error(error.message);
@@ -19,8 +18,25 @@ router.post('/getportfolios', async (req, res) => {
     }
 });
 
+// ROUTE 5:-
+// Get a portfolio using slug: GET "/api/portfolios/getportfolio/:slug"
+router.get('/getportfolio/:slug', async (req, res) => {
+    try {
+        const myPortfolio = await Portfolio.findOne({slug: req.params.slug});
+
+        if(!myPortfolio) {
+            return res.status(404).json({msg: 'Portfolio not found'});
+        }
+
+        res.json(myPortfolio);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
 // ROUTE 2:-
-// Add a new portfolio using: POST "/api/portfolio/addportfolio"
+// Add a new portfolio using: POST "/api/portfolios/addportfolio"
 router.post('/addportfolio', fetchUser, [
     // Validations for creating portfolio, using express-validator
     body('title', 'Title is required & minimum 5 characters').isLength({ min: 5 }).notEmpty(),
@@ -58,7 +74,7 @@ router.post('/addportfolio', fetchUser, [
 });
 
 // ROUTE 3:-
-// Update Portfolio using: PUT "/api/portfolio/updateportfolio/:id"
+// Update Portfolio using: PUT "/api/portfolios/updateportfolio/:id"
 router.put('/updateportfolio/:id', fetchUser, async (req, res) => {
     // Checking if the current user is superuser
     const currentUser = await User.findById(req.user.id);
@@ -92,7 +108,7 @@ router.put('/updateportfolio/:id', fetchUser, async (req, res) => {
 });
 
 // ROUTE 4:-
-// Delete Portfolio using: DELETE "/api/portfolio/deleteportfolio/:id"
+// Delete Portfolio using: DELETE "/api/portfolios/deleteportfolio/:id"
 router.delete('/deleteportfolio/:id', fetchUser, async (req, res) => {
     // Checking if the current user is superuser
     const currentUser = await User.findById(req.user.id);
