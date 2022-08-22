@@ -10,6 +10,8 @@ The backend is designed with express and using database MongoDB.\
 It uses JSON Web Token(JWT) to verify the authorization of users.
 
 It is having API endpoints for login, signup of users, CRUD on portfolios, etc.
+
+It is the MEN of the MERN stack portfolio application!
 	
 ## Technologies
 Project is created with:
