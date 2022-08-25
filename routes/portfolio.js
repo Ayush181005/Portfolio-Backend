@@ -42,15 +42,16 @@ router.post('/addportfolio', fetchUser, [
     body('title', 'Title is required & minimum 5 characters').isLength({ min: 5 }).notEmpty(),
     body('desc', 'Minimum 20 characters').isLength({ min: 20 })
 ], async (req, res) => {
+    let success = false;
     // If there are errors, return the Bad Request status code with the errors, using express-validator
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array(), success });
     }
 
     // Checking if the current user is superuser
     const currentUser = await User.findById(req.user.id);
-    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}]});
+    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
 
     try {
         // Saving Portfolio
@@ -65,8 +66,8 @@ router.post('/addportfolio', fetchUser, [
             user: req.user.id
         });
         const savedPortfolio = await portfolio.save();
-
-        res.json(savedPortfolio);
+        success = true;
+        res.json({portfolio:savedPortfolio, success});
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Something went wrong...');
@@ -76,9 +77,10 @@ router.post('/addportfolio', fetchUser, [
 // ROUTE 3:-
 // Update Portfolio using: PUT "/api/portfolios/updateportfolio/:id"
 router.put('/updateportfolio/:id', fetchUser, async (req, res) => {
+    let success = false;
     // Checking if the current user is superuser
     const currentUser = await User.findById(req.user.id);
-    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}]});
+    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
 
     try {
         // Updating Portfolio
@@ -95,12 +97,13 @@ router.put('/updateportfolio/:id', fetchUser, async (req, res) => {
 
         // Find note to be updated
         let portfolio = await Portfolio.findById(req.params.id);
-        if (!portfolio) return res.status(404).json({errors: [{msg: 'Not Found'}]});
-        if (portfolio.user.toString() !== req.user.id) return res.status(401).json({errors: [{msg: 'Access denied!'}]});
+        if (!portfolio) return res.status(404).json({errors: [{msg: 'Not Found'}], success});
+        if (portfolio.user.toString() !== req.user.id) return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
 
         // Update note
         portfolio = await Portfolio.findByIdAndUpdate(req.params.id, {$set: updatedPortfolio}, {new: true});
-        res.json(portfolio);
+        success = true;
+        res.json({portfolio, success});
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Something went wrong...');
@@ -110,21 +113,22 @@ router.put('/updateportfolio/:id', fetchUser, async (req, res) => {
 // ROUTE 4:-
 // Delete Portfolio using: DELETE "/api/portfolios/deleteportfolio/:id"
 router.delete('/deleteportfolio/:id', fetchUser, async (req, res) => {
+    let success = false;
     // Checking if the current user is superuser
     const currentUser = await User.findById(req.user.id);
-    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}]});
+    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
 
     try {
         // Deleting Portfolio
         // Finding portfolio to be deleted
         let portfolio = await Portfolio.findById(req.params.id);
-        if (!portfolio) return res.status(404).json({errors: [{msg: 'Not Found'}]});
-        if (portfolio.user.toString() !== req.user.id) return res.status(401).json({errors: [{msg: 'Access denied!'}]});
+        if (!portfolio) return res.status(404).json({errors: [{msg: 'Not Found'}], success});
+        if (portfolio.user.toString() !== req.user.id) return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
 
         // Delete portfolio
-        portfolio = await Portfolio.findByIdAndDelete(req.params.id);
-
-        res.json({success: [{msg: 'Portfolio Deleted Succesfullt!'}, {portfolio}]});
+        deletedPortfolio = await Portfolio.findByIdAndDelete(req.params.id);
+        success = true;
+        res.json({portfolio: deletedPortfolio, success});
         
     } catch (error) {
         console.error(error.message);

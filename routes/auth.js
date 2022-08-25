@@ -17,19 +17,20 @@ router.post('/signup', [
     // Validations for creating user, using express-validator
     body('name', 'Enter a name with atleast 3 letters').isLength({ min: 3 }).notEmpty(),
     body('email', 'Invalid Email').isEmail().notEmpty(),
-    body('password', 'Enter an alphanumeric password of atleast 7 letters').isLength({ min: 7 }).isAlphanumeric().notEmpty()
+    body('password', 'Enter a password of atleast 5 letters').isLength({ min: 5 }).notEmpty()
 ], async (req, res) => {
+    let success = false;
     // If there are errors, return the Bad Request status code with the errors, using express-validator
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array(), success });
     }
 
     try {
         // Check whether the user with this email already exists
         let user = await User.findOne({ email: req.body.email });
         if (user) {
-            return res.status(400).json({errors: [{msg: 'User already exists'}]});
+            return res.status(400).json({errors: [{msg: 'User already exists'}], success});
         }
 
         // Securing the password using bcrypt, hashing, adding salt and pepper
@@ -49,8 +50,9 @@ router.post('/signup', [
                 id: user.id
             }
         }
-        const authToken = jwt.sign(data, JWT_SECRET)
-        res.json({authToken});
+        const authToken = jwt.sign(data, JWT_SECRET);
+        success = true;
+        res.json({authToken, success});
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Something went wrong...');
@@ -64,23 +66,25 @@ router.post('/login', [
     body('email', 'Invalid Email').isEmail().notEmpty(),
     body('password', 'Password is required').notEmpty()
 ], async (req, res) => {
+    let success = false;
+
     // If there are errors, return the Bad Request status code with the errors, using express-validator
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-        return res.status(400).json({ errors: errors.array() });
+        return res.status(400).json({ errors: errors.array(), success });
     }
 
     const { email, password } = req.body;
     try {
         let user = await User.findOne({ email });
         if (!user) {
-            return res.status(400).json({errors: [{msg: 'Invalid Credentials'}]});
+            return res.status(400).json({errors: [{msg: 'Invalid Credentials'}], success});
         }
 
         // Using bcrypt to compare the password with the hashed password in the database
         const passwordCompare = await bcrypt.compare(password, user.password); // returns a boolean
         if (!passwordCompare) {
-            return res.status(400).json({errors: [{msg: 'Invalid Credentials'}]});
+            return res.status(400).json({errors: [{msg: 'Invalid Credentials'}], success});
         }
 
         const data = { // this data is also called payload in JWT
@@ -89,8 +93,9 @@ router.post('/login', [
             }
         }
 
-        const authToken = jwt.sign(data, JWT_SECRET)
-        res.json({authToken});
+        const authToken = jwt.sign(data, JWT_SECRET);
+        success = true;
+        res.json({authToken, success});
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Something went wrong...');
