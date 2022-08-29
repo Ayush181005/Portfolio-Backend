@@ -35,12 +35,28 @@ router.get('/getportfolio/:slug', async (req, res) => {
     }
 });
 
+// ROUTE 5:-
+// Get a portfolio using slug: GET "/api/portfolios/getportfolio/:slug"
+router.get('/getportfoliofromid/:id', async (req, res) => {
+    try {
+        const myPortfolio = await Portfolio.findById(req.params.id);
+
+        if(!myPortfolio) {
+            return res.status(404).json({msg: 'Portfolio not found'});
+        }
+
+        res.json(myPortfolio);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
 // ROUTE 2:-
 // Add a new portfolio using: POST "/api/portfolios/addportfolio"
 router.post('/addportfolio', fetchUser, [
     // Validations for creating portfolio, using express-validator
-    body('title', 'Title is required & minimum 5 characters').isLength({ min: 5 }).notEmpty(),
-    body('desc', 'Minimum 20 characters').isLength({ min: 20 })
+    body('title', 'Title is required & minimum 5 characters').isLength({ min: 5 }).notEmpty()
 ], async (req, res) => {
     let success = false;
     // If there are errors, return the Bad Request status code with the errors, using express-validator
