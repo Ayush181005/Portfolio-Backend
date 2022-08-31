@@ -3,6 +3,8 @@ const Contact = require('../models/Contact');
 const { body, validationResult } = require('express-validator');
 const fetchUser = require('../middleware/fetchUser');
 const User = require('../models/User');
+const config = require('config');
+const fetch = require('node-fetch');
 
 const router = express.Router();
 
@@ -22,7 +24,13 @@ router.post('/addcontact', [
     }
 
     try {
-        const { name, email, msg } = req.body;
+        const { name, email, msg, recaptchaToken } = req.body;
+
+        // ReCaptcha validation
+        const recaptchaSecret = config.get('ReCAPTCHA_SECRET_KEY');
+        const recaptchaResponse = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaToken}`, {method:'POST'});
+        const recaptchaData = await recaptchaResponse.json();
+        if (!recaptchaData.success) return res.status(400).json({ errors: [{msg: "Please ensure that you are not a bot"}], success: false });
 
         const contact = new Contact({name, email, msg});
         const savedContact = await contact.save();
