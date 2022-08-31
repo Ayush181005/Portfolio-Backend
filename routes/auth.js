@@ -117,5 +117,46 @@ router.post('/getuser', fetchUser, async (req, res) => {
     }
 });
 
+// ROUTE 4:-
+// Get data of all users using: POST "/api/auth/getusers"
+router.post('/getusers', fetchUser, async (req, res) => {
+    try {
+        const myUsers = await User.find()
+        res.json(myUsers);
+
+        // Checking if the current user is superuser
+        const currentUser = await User.findById(req.user.id);
+        if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
+// ROUTE 5:-
+// Delete User using: DELETE "/api/auth/deleteuser/:id"
+router.delete('/deleteuser/:id', fetchUser, async (req, res) => {
+    let success = false;
+    // Checking if the current user is superuser
+    const currentUser = await User.findById(req.user.id);
+    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
+
+    try {
+        // Deleting User
+        // Finding user to be deleted
+        let user = await User.findById(req.params.id);
+        if (!user) return res.status(404).json({errors: [{msg: 'Not Found'}], success});
+
+        // Delete contact
+        deletedUser = await User.findByIdAndDelete(req.params.id);
+        success = true;
+        res.json({user: deletedUser, success});
+        
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
 
 module.exports = router;
