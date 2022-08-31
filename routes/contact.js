@@ -50,4 +50,29 @@ router.post('/getcontacts', fetchUser, async (req, res) => {
     }
 });
 
+// ROUTE 3:-
+// Delete Contact using: DELETE "/api/contacts/deletecontact/:id"
+router.delete('/deletecontact/:id', fetchUser, async (req, res) => {
+    let success = false;
+    // Checking if the current user is superuser
+    const currentUser = await User.findById(req.user.id);
+    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
+
+    try {
+        // Deleting Contact
+        // Finding contact to be deleted
+        let contact = await Contact.findById(req.params.id);
+        if (!contact) return res.status(404).json({errors: [{msg: 'Not Found'}], success});
+
+        // Delete contact
+        deletedContact = await Contact.findByIdAndDelete(req.params.id);
+        success = true;
+        res.json({contact: deletedContact, success});
+        
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
 module.exports = router;
