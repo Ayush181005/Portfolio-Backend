@@ -3,8 +3,19 @@ const Portfolio = require('../models/portfolio');
 const { body, validationResult } = require('express-validator');
 const fetchUser = require('../middleware/fetchUser');
 const User = require('../models/User');
+const multer  = require('multer');
 
 const router = express.Router();
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, 'uploads/')
+    },
+    filename: function (req, file, cb) {
+        cb(null, Date.now() + file.originalname)
+    }
+});
+const upload = multer({ storage });
 
 // ROUTE 1:-
 // Get all portfolios using: POST "/api/portfolios/getportfolios"
@@ -54,7 +65,7 @@ router.get('/getportfoliofromid/:id', async (req, res) => {
 
 // ROUTE 2:-
 // Add a new portfolio using: POST "/api/portfolios/addportfolio"
-router.post('/addportfolio', fetchUser, [
+router.post('/addportfolio', upload.single('image'), [
     // Validations for creating portfolio, using express-validator
     body('title', 'Title is required & minimum 5 characters').isLength({ min: 5 }).notEmpty()
 ], async (req, res) => {
@@ -66,8 +77,8 @@ router.post('/addportfolio', fetchUser, [
     }
 
     // Checking if the current user is superuser
-    const currentUser = await User.findById(req.user.id);
-    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
+    // const currentUser = await User.findById(req.user.id);
+    // if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
 
     try {
         // Saving Portfolio
@@ -79,7 +90,8 @@ router.post('/addportfolio', fetchUser, [
             type,
             slug,
             links,
-            user: req.user.id
+            user: '63073b813636fd0c6cba37f8'
+            // user: req.user.id
         });
         const savedPortfolio = await portfolio.save();
         success = true;
