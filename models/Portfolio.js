@@ -9,10 +9,10 @@ const PortfolioSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    // img: {
-    //     type: String,
-    //     required: true
-    // },
+    img: {
+        data: Buffer,
+        contentType: String
+    },
     desc: String,
     type: String,
     slug: String,

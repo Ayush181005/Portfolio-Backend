@@ -4,15 +4,19 @@ const { body, validationResult } = require('express-validator');
 const fetchUser = require('../middleware/fetchUser');
 const User = require('../models/User');
 const multer  = require('multer');
+const fs = require('fs');
+const path = require('path');
 
 const router = express.Router();
 
+const imgPrefix = Date.now() + '-' + Math.round(Math.random()*1E9)
+// multer config for image upload
 const storage = multer.diskStorage({
-    destination: function (req, file, cb) {
+    destination: (req, file, cb) => {
         cb(null, 'uploads/')
     },
-    filename: function (req, file, cb) {
-        cb(null, Date.now() + file.originalname)
+    filename: (req, file, cb) => {
+        cb(null, imgPrefix+file.originalname)
     }
 });
 const upload = multer({ storage });
@@ -65,7 +69,7 @@ router.get('/getportfoliofromid/:id', async (req, res) => {
 
 // ROUTE 2:-
 // Add a new portfolio using: POST "/api/portfolios/addportfolio"
-router.post('/addportfolio', upload.single('image'), [
+router.post('/addportfolio', fetchUser, upload.single('image'), [
     // Validations for creating portfolio, using express-validator
     body('title', 'Title is required & minimum 5 characters').isLength({ min: 5 }).notEmpty()
 ], async (req, res) => {
@@ -77,21 +81,23 @@ router.post('/addportfolio', upload.single('image'), [
     }
 
     // Checking if the current user is superuser
-    // const currentUser = await User.findById(req.user.id);
-    // if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
+    const currentUser = await User.findById(req.user.id);
+    if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
 
     try {
         // Saving Portfolio
         const { title, desc, type, slug, links } = req.body;
-
         const portfolio = new Portfolio({
             title,
             desc,
             type,
             slug,
             links,
-            user: '63073b813636fd0c6cba37f8'
-            // user: req.user.id
+            user: req.user.id,
+            img: req.file ? {
+                data: fs.readFileSync(path.join(__dirname, '..', 'uploads', req.file.filename)),
+                contentType: 'image/*'
+            } : null
         });
         const savedPortfolio = await portfolio.save();
         success = true;
