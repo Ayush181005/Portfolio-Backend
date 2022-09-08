@@ -5,6 +5,7 @@ const bcrypt = require('bcryptjs');
 const config = require('config');
 const jwt = require('jsonwebtoken');
 const fetchUser = require('../middleware/fetchUser');
+const fetch = require('node-fetch');
 
 const router = express.Router();
 
@@ -27,6 +28,12 @@ router.post('/signup', [
     }
 
     try {
+        // ReCaptcha validation
+        const recaptchaToken = req.body.recaptchaToken;
+        const recaptchaSecret = config.get('ReCAPTCHA_SECRET_KEY');
+        const recaptchaResponse = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaToken}`, {method:'POST'});
+        const recaptchaData = await recaptchaResponse.json();
+        if (!recaptchaData.success) return res.status(400).json({ errors: [{msg: "Please ensure that you are not a bot"}], success: false });
         // Check whether the user with this email already exists
         let user = await User.findOne({ email: req.body.email });
         if (user) {
@@ -74,8 +81,14 @@ router.post('/login', [
         return res.status(400).json({ errors: errors.array(), success });
     }
 
-    const { email, password } = req.body;
+    const { email, password, recaptchaToken } = req.body;
     try {
+        // ReCaptcha validation
+        const recaptchaSecret = config.get('ReCAPTCHA_SECRET_KEY');
+        const recaptchaResponse = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaToken}`, {method:'POST'});
+        const recaptchaData = await recaptchaResponse.json();
+        if (!recaptchaData.success) return res.status(400).json({ errors: [{msg: "Please ensure that you are not a bot"}], success: false });
+
         let user = await User.findOne({ email });
         if (!user) {
             return res.status(400).json({errors: [{msg: 'Invalid Credentials'}], success});
