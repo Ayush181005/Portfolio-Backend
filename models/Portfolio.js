@@ -19,7 +19,8 @@ const PortfolioSchema = new mongoose.Schema({
     date: {
         type: Date,
         default: Date.now
-    }
+    },
+    links: String // will be seperated by comma and space ', '
 });
 
 module.exports = mongoose.model('Portfolio', PortfolioSchema);
