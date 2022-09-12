@@ -16,7 +16,7 @@ const storage = multer.diskStorage({
         cb(null, 'uploads/certificates')
     },
     filename: (req, file, cb) => {
-        cb(null, file.originalname+imgSuffix+file.originalname.split('.').pop())
+        cb(null, file.originalname+imgSuffix+'.'+file.originalname.split('.').pop())
     }
 });
 const upload = multer({ storage });
