@@ -9,14 +9,14 @@ const path = require('path');
 
 const router = express.Router();
 
-const imgPrefix = Date.now() + '-' + Math.round(Math.random()*1E9)
+const imgSuffix = Date.now() + '-' + Math.round(Math.random()*1E9)
 // multer config for image upload
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-        cb(null, 'uploads/')
+        cb(null, 'uploads/portfolio')
     },
     filename: (req, file, cb) => {
-        cb(null, imgPrefix+file.originalname)
+        cb(null, file.originalname+imgSuffix+file.originalname.split('.').pop())
     }
 });
 const upload = multer({ storage });
@@ -95,7 +95,7 @@ router.post('/addportfolio', fetchUser, upload.single('image'), [
             links,
             user: req.user.id,
             img: req.file ? {
-                data: fs.readFileSync(path.join(__dirname, '..', 'uploads', req.file.filename)),
+                data: fs.readFileSync(path.join(__dirname, '..', 'uploads', 'portfolio', req.file.filename)),
                 contentType: 'image/*'
             } : null
         });

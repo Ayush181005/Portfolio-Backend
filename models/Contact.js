@@ -12,7 +12,11 @@ const ContactSchema = new mongoose.Schema({
     msg: {
         type: String,
         required: true
-    }
+    },
+    timeStamp: {
+        type: Date,
+        default: Date.now
+    },
 });
 
 module.exports = mongoose.model('Contact', ContactSchema);
