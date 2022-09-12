@@ -16,6 +16,7 @@ app.use(cors()); // middleware for allowing cross-origin requests
 // Available routes
 app.use('/api/auth/', (require('./routes/auth')));
 app.use('/api/portfolios/', (require('./routes/portfolio')));
+app.use('/api/certificates/', (require('./routes/certificate')));
 app.use('/api/contacts/', (require('./routes/contact')));
 
 app.listen(port, () => {
