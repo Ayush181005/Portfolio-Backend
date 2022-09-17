@@ -2,13 +2,14 @@
 const connectToMongo = require('./db');
 const express = require('express');
 const cors = require('cors');
-const config = require('config');
+const dotenv = require('dotenv');
 
-connectToMongo();
+dotenv.config(); // To get the environment variables
+connectToMongo(); // To connect to the database
 
 const app = express();
-const host = config.get('server.host');
-const port = config.get('server.port');
+const host = process.env.SERVER_HOST;
+const port = process.env.SERVER_PORT;
 
 app.use(express.json()); // middleware for parsing application/json in req.body
 app.use(cors()); // middleware for allowing cross-origin requests

@@ -3,10 +3,11 @@ const Contact = require('../models/Contact');
 const { body, validationResult } = require('express-validator');
 const fetchUser = require('../middleware/fetchUser');
 const User = require('../models/User');
-const config = require('config');
 const fetch = require('node-fetch');
+const dotenv = require('dotenv');
 
-const router = express.Router();
+dotenv.config(); // To get the environment variables
+const router = express.Router(); // To create a router
 
 // ROUTE 1:-
 // Add Contact using: POST "/api/contacts/addcontact"
@@ -27,7 +28,7 @@ router.post('/addcontact', [
         const { name, email, msg, recaptchaToken } = req.body;
 
         // ReCaptcha validation
-        const recaptchaSecret = config.get('ReCAPTCHA_SECRET_KEY');
+        const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
         const recaptchaResponse = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaToken}`, {method:'POST'});
         const recaptchaData = await recaptchaResponse.json();
         if (!recaptchaData.success) return res.status(400).json({ errors: [{msg: "Please ensure that you are not a bot"}], success: false });
@@ -46,12 +47,13 @@ router.post('/addcontact', [
 // Get all Contacts using: POST "/api/contacts/getcontacts"
 router.post('/getcontacts', fetchUser, async (req, res) => {
     try {
-        const myPortfolios = await Contact.find()
-        res.json(myPortfolios);
-
         // Checking if the current user is superuser
         const currentUser = await User.findById(req.user.id);
         if (currentUser.type !== 'superuser') return res.status(401).json({errors: [{msg: 'Access denied!'}], success});
+
+        const myContacts = await Contact.find()
+        res.json(myContacts);
+
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Something went wrong...');

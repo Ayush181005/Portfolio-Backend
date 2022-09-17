@@ -2,15 +2,15 @@ const express = require('express');
 const User = require('../models/User');
 const { body, validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
-const config = require('config');
 const jwt = require('jsonwebtoken');
 const fetchUser = require('../middleware/fetchUser');
 const fetch = require('node-fetch');
+const dotenv = require('dotenv');
 
-const router = express.Router();
+dotenv.config(); // To get the environment variables
+const router = express.Router(); // To create a router
 
-const JWT_SECRET = config.get('JWT_SECRET');
-
+const JWT_SECRET = process.env.JWT_SECRET;
 
 // ROUTE 1:-
 // Create a User using: POST "/api/auth/signup"
@@ -30,7 +30,7 @@ router.post('/signup', [
     try {
         // ReCaptcha validation
         const recaptchaToken = req.body.recaptchaToken;
-        const recaptchaSecret = config.get('ReCAPTCHA_SECRET_KEY');
+        const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
         const recaptchaResponse = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaToken}`, {method:'POST'});
         const recaptchaData = await recaptchaResponse.json();
         if (!recaptchaData.success) return res.status(400).json({ errors: [{msg: "Please ensure that you are not a bot"}], success: false });
@@ -84,7 +84,7 @@ router.post('/login', [
     const { email, password, recaptchaToken } = req.body;
     try {
         // ReCaptcha validation
-        const recaptchaSecret = config.get('ReCAPTCHA_SECRET_KEY');
+        const recaptchaSecret = process.env.RECAPTCHA_SECRET_KEY;
         const recaptchaResponse = await fetch(`https://www.google.com/recaptcha/api/siteverify?secret=${recaptchaSecret}&response=${recaptchaToken}`, {method:'POST'});
         const recaptchaData = await recaptchaResponse.json();
         if (!recaptchaData.success) return res.status(400).json({ errors: [{msg: "Please ensure that you are not a bot"}], success: false });
