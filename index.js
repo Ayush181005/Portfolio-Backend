@@ -14,6 +14,11 @@ const port = process.env.SERVER_PORT;
 app.use(express.json()); // middleware for parsing application/json in req.body
 app.use(cors()); // middleware for allowing cross-origin requests
 
+// Checking the server
+app.get('/', (req, res) => {
+    res.send("Hello, World. The app is running!");
+});
+
 // Available routes
 app.use('/api/auth/', (require('./routes/auth')));
 app.use('/api/portfolios/', (require('./routes/portfolio')));
