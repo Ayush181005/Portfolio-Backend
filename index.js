@@ -4,12 +4,14 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 
+// const portfolioRoutes = require('./routes/portfolio');
+
 dotenv.config(); // To get the environment variables
 connectToMongo(); // To connect to the database
 
 const app = express();
-const host = process.env.SERVER_HOST;
-const port = process.env.SERVER_PORT;
+const host = process.env.HOST;
+const port = process.env.PORT;
 
 app.use(express.json()); // middleware for parsing application/json in req.body
 app.use(cors()); // middleware for allowing cross-origin requests
@@ -20,11 +22,11 @@ app.get('/', (req, res) => {
 });
 
 // Available routes
-app.use('/api/auth/', (require('./routes/auth')));
-app.use('/api/portfolios/', (require('./routes/portfolio')));
-app.use('/api/certificates/', (require('./routes/certificate')));
-app.use('/api/contacts/', (require('./routes/contact')));
+app.use('/api/auth/', require('./routes/auth'));
+app.use('/api/portfolios/', require('./routes/portfolio'));
+app.use('/api/certificates/', require('./routes/certificate'));
+app.use('/api/contacts/', require('./routes/contact'));
 
-app.listen(port, () => {
+app.listen(port || 3000, () => {
     console.log(`Listening at http://${host}:${port}`);
 });

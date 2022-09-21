@@ -1,5 +1,5 @@
 const express = require('express');
-const Portfolio = require('../models/portfolio');
+const Portfolio = require('../models/Portfolio');
 const { body, validationResult } = require('express-validator');
 const fetchUser = require('../middleware/fetchUser');
 const User = require('../models/User');
