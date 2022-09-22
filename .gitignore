@@ -3,8 +3,3 @@ node_modules
 
 # config files
 .env
-
-uploads/*.jpg
-uploads/*.jpeg
-uploads/*.png
-uploads/*.gif
