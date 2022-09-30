@@ -10,8 +10,8 @@ dotenv.config(); // To get the environment variables
 connectToMongo(); // To connect to the database
 
 const app = express();
-const host = process.env.HOST;
-const port = process.env.PORT;
+// const host = process.env.HOST; // development
+const port = process.env.PORT || 3000;
 
 app.use(express.json()); // middleware for parsing application/json in req.body
 app.use(cors()); // middleware for allowing cross-origin requests
@@ -27,6 +27,7 @@ app.use('/api/portfolios/', require('./routes/portfolio'));
 app.use('/api/certificates/', require('./routes/certificate'));
 app.use('/api/contacts/', require('./routes/contact'));
 
-app.listen(port || 3000, () => {
-    console.log(`Listening at http://${host}:${port}`);
+app.listen(port, () => {
+    console.log(`Listening at port ${port}`); // production
+    // console.log(`Listening at http://${host}:${port}`); // development
 });
