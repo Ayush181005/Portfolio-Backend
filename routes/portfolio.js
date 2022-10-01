@@ -86,13 +86,14 @@ router.post('/addportfolio', fetchUser, upload.single('image'), [
 
     try {
         // Saving Portfolio
-        const { title, desc, type, slug, links } = req.body;
+        const { title, desc, type, slug, githubLink, websiteLink } = req.body;
         const portfolio = new Portfolio({
             title,
             desc,
             type,
             slug,
-            links,
+            githubLink,
+            websiteLink,
             user: req.user.id,
             img: req.file ? {
                 data: fs.readFileSync(path.join(__dirname, '..', 'uploads', 'portfolio', req.file.filename)),
@@ -118,7 +119,7 @@ router.put('/updateportfolio/:id', fetchUser, async (req, res) => {
 
     try {
         // Updating Portfolio
-        const { title, desc, type, slug, links } = req.body;
+        const { title, desc, type, slug, githubLink, websiteLink } = req.body;
 
         const updatedPortfolio = {};
 
@@ -127,7 +128,8 @@ router.put('/updateportfolio/:id', fetchUser, async (req, res) => {
         desc ? updatedPortfolio.desc = desc : null;
         type ? updatedPortfolio.type = type : null;
         slug ? updatedPortfolio.slug = slug : null;
-        links ? updatedPortfolio.links = links : null;
+        githubLink ? updatedPortfolio.githubLink = githubLink : null;
+        websiteLink ? updatedPortfolio.websiteLink = websiteLink : null;
 
         // Find note to be updated
         let portfolio = await Portfolio.findById(req.params.id);
