@@ -14,7 +14,7 @@ const app = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json()); // middleware for parsing application/json in req.body
-app.use(cors({origin: 'https://www.theayush.in'})); // middleware for allowing cross-origin requests
+app.use(cors({origin: '*'})); // middleware for allowing cross-origin requests
 
 // Checking the server
 app.get('/', (req, res) => {
