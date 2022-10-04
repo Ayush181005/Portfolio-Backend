@@ -13,9 +13,6 @@ const app = express();
 // const host = process.env.HOST; // development
 const port = process.env.PORT || 3000;
 
-app.use(express.json()); // middleware for parsing application/json in req.body
-app.use(cors()); // middleware for allowing cross-origin requests
-// Add headers before the routes are defined
 app.use(function (req, res, next) {
 
     // Website you wish to allow to connect
@@ -34,6 +31,9 @@ app.use(function (req, res, next) {
     // Pass to next layer of middleware
     next();
 });
+
+app.use(express.json()); // middleware for parsing application/json in req.body
+app.use(cors()); // middleware for allowing cross-origin requests
 
 // Checking the server
 app.get('/', (req, res) => {
