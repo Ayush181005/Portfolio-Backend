@@ -24,6 +24,10 @@ const CertificateSchema = new mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    winner: {
+        type: Boolean,
+        default: false
     }
 });
 

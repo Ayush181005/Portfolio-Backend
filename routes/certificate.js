@@ -52,11 +52,12 @@ router.post('/addcertificate', fetchUser, upload.single('image'), [
 
     try {
         // Saving Certificate
-        const { compName, year, field } = req.body;
+        const { compName, year, field, winner } = req.body;
         const certificate = new Certificate({
             compName,
             year,
             field,
+            winner,
             user: req.user.id,
             img: req.file ? {
                 data: fs.readFileSync(path.join(__dirname, '..', 'uploads', 'certificates', req.file.filename)),
@@ -72,7 +73,7 @@ router.post('/addcertificate', fetchUser, upload.single('image'), [
     }
 });
 
-// ROUTE 4:-
+// ROUTE 3:-
 // Delete Certificate using: DELETE "/api/certificates/deletecertificate/:id"
 router.delete('/deletecertificate/:id', fetchUser, async (req, res) => {
     let success = false;
