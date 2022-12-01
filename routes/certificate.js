@@ -123,4 +123,17 @@ router.get('/getsomecertificates', async (req, res) => {
     }
 });
 
+// ROUTE 5:-
+// Get no. of total certificates using: GET "/api/certificates/getnumcertificates"
+router.get('/getnumcertificates', async (req, res) => {
+    try {
+        // Count total number of certificates
+        const totalCertificates = await Certificate.countDocuments();
+        res.json(totalCertificates);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
 module.exports = router;
