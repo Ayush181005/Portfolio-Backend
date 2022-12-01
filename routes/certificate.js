@@ -99,4 +99,28 @@ router.delete('/deletecertificate/:id', fetchUser, async (req, res) => {
     }
 });
 
+// ROUTE 4:-
+// Get a certificate by page using: GET "/api/certificates/getsomecertificates?page=1&size=10"
+router.get('/getsomecertificates', async (req, res) => {
+    try {
+        const page = parseInt(req.query.page);
+        const size = parseInt(req.query.size);
+        const query = {};
+        if (page < 0 || page === 0) {
+            response = { "error": true, "message": "invalid page number, should start with 1" };
+            return res.json(response);
+        }
+        query.skip = size * (page - 1);
+        query.limit = size;
+        // Find some certificates
+        const certificates = await Certificate.find({}, {}, query);
+        // Count total number of certificates
+        const totalCertificates = await Certificate.countDocuments();
+        res.json({certificates, totalCertificates});
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
 module.exports = router;
