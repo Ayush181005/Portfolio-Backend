@@ -110,6 +110,7 @@ router.get('/getsomecertificates', async (req, res) => {
             response = { "error": true, "message": "invalid page number, should start with 1" };
             return res.json(response);
         }
+        query.sort = { year: -1 };
         query.skip = size * (page - 1);
         query.limit = size;
         // Find some certificates
