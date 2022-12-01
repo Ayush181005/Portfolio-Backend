@@ -113,10 +113,10 @@ router.get('/getsomecertificates', async (req, res) => {
         query.skip = size * (page - 1);
         query.limit = size;
         // Find some certificates
-        const certificates = await Certificate.find({}, {}, query);
+        const myCertificates = await Certificate.find({}, {}, query);
         // Count total number of certificates
-        const totalCertificates = await Certificate.countDocuments();
-        res.json({certificates, totalCertificates});
+        // const totalCertificates = await Certificate.countDocuments();
+        res.json(myCertificates);
     } catch (error) {
         console.error(error.message);
         res.status(500).send('Something went wrong...');
