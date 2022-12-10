@@ -137,4 +137,30 @@ router.get('/getnumcertificates', async (req, res) => {
     }
 });
 
+// ROUTE 6:-
+// Get list of all fields using: GET "/api/certificates/getfields"
+router.get('/getfields', async (req, res) => {
+    try {
+        // Get list of all fields
+        const fields = await Certificate.find().distinct('field');
+        res.json(fields);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
+// ROUTE 7:-
+// Get certificates by field using: GET "/api/certificates/getcertificatesbyfield?field=field"
+router.get('/getcertificatesbyfield', async (req, res) => {
+    try {
+        // Get certificates by field
+        const certificates = await Certificate.find({field:req.query.field});
+        res.json(certificates);
+    } catch (error) {
+        console.error(error.message);
+        res.status(500).send('Something went wrong...');
+    }
+});
+
 module.exports = router;
